@@ -1,7 +1,27 @@
 {
+  "name": "truvaldentalbackend",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/GeckoZam/TruvalDentalBackEnd#readme",
+  "bugs": {
+    "url": "https://github.com/GeckoZam/TruvalDentalBackEnd/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GeckoZam/TruvalDentalBackEnd.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
   "dependencies": {
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "pg": "^8.13.3",
     "pg-hstore": "^2.3.4",
