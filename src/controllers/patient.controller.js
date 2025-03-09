@@ -1,114 +1,111 @@
-const db = require("../models")
-const Patient = db.patient
-const Op = db.Sequelize.Op
+import { Patient } from "../models/patient.model.js";
 
-exports.createPatient = (req, res) => {
-    // validate petition
-    if (!req.body.name && !req.body.lastName && !req.body.surName && !req.body.phone && !req.body.birthDate) {
-        res.status(400).send({
-            message: "The content cannot be empty"
-        });
-        return;
+export const createPatient = async (req, res) => {
+    try {
+        // validate petition
+        if (!req.body.name || !req.body.lastName || !req.body.surName || !req.body.phone || !req.body.birthDate) {
+            res.status(400).json({
+                message: "The content cannot be empty"
+            });
+            return;
+        }
+
+        // create patient
+        const patient = {
+            name: req.body.name,
+            lastName: req.body.lastName,
+            surName: req.body.surName,
+            sex: req.body.sex,
+            phone: req.body.phone,
+            birthDate: req.body.birthDate
+        };
+
+        // save patient in the database
+        await Patient.create(patient)
+        
+        res.status(200).json({
+            message: "Patient was created successfully."
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Error while creating the patient"
+        })
     }
-
-    // create patient
-    const patient = {
-        name: req.body.name,
-        lastName: req.body.lastName,
-        surName: req.body.surName,
-        sex: req.body.sex,
-        phone: req.body.phone,
-        birthDate: req.body.birthDate
-    };
-
-    // save patient in the database
-    Patient.create(patient)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message:
-                    err.message || "An error occurred while creating the patient."
-            });
-        });
 }
 
-exports.findAllPatients = (req, res) => {
-    const name = req.query.name;
-    var condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
+export const findAllPatients = async (req, res) => {
+    try {
+        const name = req.query.name;
+        var condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
+    
+        const patient = await Patient.findAll({ where: condition })
+        
+        res.status(200).json(patient)
 
-    Patient.findAll({ where: condition })
-        .then(data => {
-            res.send(data);
+    } catch (error) {
+        res.status(500).json({
+            message: "An error ocurred while retrieving the patients."
         })
-        .catch(err => {
-            res.status(500).send({
-                message:
-                    err.message || "An error occurred while retrieving patients."
-            });
-        });
+    }
+}
+
+export const findOnePatientById = async (req, res) => {
 
 }
 
-exports.findOnePatientById = (req, res) => {
-    const idPatient = req.params.idPatient;
+export const updatePatient = async (req, res) => {
+    try {
 
-    Patient.findByPk(idPatient)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error retrieving patient with id=" + idPatient
+        const { idPatient } = req.params;
+        const { name, lastName, surName, sex, phone, birthDate } = req.body;
+
+        const patient = await Patient.findByPk(idPatient);
+
+        if (!patient) {
+
+            res.status(404).json({ 
+                message: "Patient not found" 
             });
+            return;
+
+        } else {
+
+            patient.name = name
+            patient.lastName = lastName
+            patient.surName = surName
+            patient.sex = sex
+            patient.phone = phone
+            patient.birthDate = birthDate
+
+            await patient.save()
+
+            res.status(200).json(patient);
+        }
+
+    } catch (error) {
+        res.status(500).json({ 
+            message: "Error finding the patient" 
         });
+    }
 }
 
-exports.updatePatient = (req, res) => {
-    const idPatient = req.params.idPatient;
+export const deletePatient = async (req, res) => {
+    try {
+        const {idPatient} = req.params;
 
-    Patient.update(req.body, {
-        where: { idPatient: idPatient }
-    })
-        .then(num => {
-            if (num == 1) {
-                res.send({
-                    message: "Patient was updated successfully."
-                });
-            } else {
-                res.send({
-                    message: `Cannot update Patient with id=${idPatient}. Maybe Patient was not found or req.body is empty!`
-                });
+        await Patient.destroy({
+            where: {
+                idPatient: idPatient
             }
         })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error updating Patient with id = " + idPatient
-            });
-        });
-}
 
-exports.deletePatient = (req, res) => {
-    const idPatient = req.params.idPatient;
-
-    Patient.destroy({
-        where: { idPatient: idPatient }
-    })
-        .then(num => {
-            if (num == 1) {
-                res.send({
-                    message: "Patient was deleted successfully!"
-                });
-            } else {
-                res.send({
-                    message: `Cannot delete Patient with id=${idPatient}. Maybe Patient was not found!`
-                });
-            }
+        res.status(204).json({
+            message: "Patient deleted successfully."
         })
-        .catch(err => {
-            res.status(500).send({
-                message: "Could not delete Patient with id=" + idPatient
-            });
-        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Error while deleting the Patient."
+        })
+    }
 }

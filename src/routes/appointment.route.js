@@ -1,16 +1,27 @@
-const express = require('express')
-const appointmentController = require('../controllers/appointment.controller')
+import { Router } from "express";
 
-const router = express.Router()
+import { 
+    createAppointment, 
+    findAllAppointments, 
+    findOneAppointmentById, 
+    findAppointmentsByPatientId, 
+    findAppointmentsByDoctorId, 
+    findAppointmentsByDate, 
+    findAppointmentsByDateRange, 
+    updateAppointment, 
+    deleteAppointment 
+} from '../controllers/appointment.controller.js';
 
-router.route('/').post(appointmentController.createAppointment)
-router.route('/').get(appointmentController.findAllAppointments)
-router.route('/').get(appointmentController.findOneAppointmentById)
-router.route('/').get(appointmentController.findAppointmentsByPatientId)
-router.route('/').get(appointmentController.findAppointmentsByDoctorId)
-router.route('/').get(appointmentController.findAppointmentsByDate)
-router.route('/').get(appointmentController.findAppointmentsByDateRange)
-router.route('/').put(appointmentController.updateAppointment)
-router.route('/').delete(appointmentController.deleteAppointment)
+const router = Router()
 
-module.exports = router ;
+router.post('/appointments', createAppointment)
+router.get('/appointments', findAllAppointments)
+router.get('/appointments/:idAppointment', findOneAppointmentById)
+router.get('/appointments/:idPatient', findAppointmentsByPatientId)
+router.get('/appointments/:idUser', findAppointmentsByDoctorId)
+router.get('/appointments', findAppointmentsByDate)
+router.get('/appointments', findAppointmentsByDateRange)
+router.put('appointments/:idAppointment/', updateAppointment)
+router.delete('/appointments/:idAppointment', deleteAppointment)
+
+export default router;

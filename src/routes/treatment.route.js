@@ -1,12 +1,19 @@
-const express = require('express')
-const treatmentController = require('../controllers/treatment.controller')
+import { Router } from "express";
 
-const router = express.Router()
+import { 
+    createTreatment, 
+    findAllTreatments, 
+    findOneTreatmentById,
+    updateTreatment,
+    deleteTreatment
+} from '../controllers/treatment.controller.js';
 
-router.route('/').post(treatmentController.createTreatment)
-router.route('/').get(treatmentController.findAllTreatments)
-router.route('/').get(treatmentController.findOneTreatmentById)
-router.route('/').put(treatmentController.updateTreatment)
-router.route('/').delete(treatmentController.deleteTreatment)
+const router = Router()
 
-module.exports = router;
+router.post('/treatment', createTreatment)
+router.get('/treatment', findAllTreatments)
+router.get('/treatment/:idTreatment', findOneTreatmentById)
+router.put('/treatment/:idTreatment', updateTreatment)
+router.delete('/treatment/:idTreatment', deleteTreatment)
+
+export default router;

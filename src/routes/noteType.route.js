@@ -1,12 +1,18 @@
-const express = require('express')
-const noteTypeController = require('../controllers/noteType.controller')
+import { Router } from 'express';
+import { 
+    createNoteType,
+    findAllNoteTypes,
+    findOneNoteTypeById,
+    updateNoteType,
+    deleteNoteType
+} from '../controllers/noteType.controller.js';
 
-const router = express.Router()
+const router = Router()
 
-router.route('/').post(noteTypeController.createNoteType)
-router.route('/').get(noteTypeController.findAllNoteTypes)
-router.route('/:id').get(noteTypeController.findOneNoteTypeById)
-router.route('/:id').put(noteTypeController.updateNoteType)
-router.route('/:id').delete(noteTypeController.deleteNoteType)
+router.post('/notetype', createNoteType)
+router.get('/notetype', findAllNoteTypes)
+router.get('/notetype/:idNoteType', findOneNoteTypeById)
+router.put('/notetype/:idNoteType', updateNoteType)
+router.delete('/notetype/:idNoteType', deleteNoteType)
 
-module.exports = router;
+export default router;

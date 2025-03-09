@@ -1,69 +1,59 @@
-const db = require("../models")
-const Appointment = db.appointment
-const Op = db.Sequelize.Op
+import { Appointment } from "../models/appointment.model.js";
 
-exports.createAppointment = (req, res) => {
-    // validate petition
-    if (!req.body.appointmentDate) {
-        res.status(400).send({
-            message: "The content cannot be empty"
-        });
-        return;
+export const createAppointment = async (req, res) => {
+    try {
+        // validate petition
+        if (!req.body.appointmentDate || !req.body.idPatient || !req.body.idTreatment || !req.body.idUser) {
+            res.status(400).json({
+                message: "The content cannot be empty"
+            });
+            return;
+        }
+
+        // create appointment
+        const appointment = {
+            appointmentDate: req.body.appointmentDate,
+            idPatient: req.body.idPatient,
+            idTreatment: req.body.idTreatment,
+            idUser: req.body.idUser
+        };
+
+        // save appointment in the database
+        await Appointment.create(appointment)
+
+        res.status(200).json({
+            message: "Appointment created successfully."
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "Error while creating the appointment."
+        })
     }
-
-    // create appointment
-    const appointment = {
-        idPatient: req.body.idPatient,
-        appointmentDate: req.body.appointmentDate,
-        idTreatment: req.body.idTreatment,
-        idUser: req.body.idUser
-    };
-
-    // save patient in the database
-    Appointment.create(appointment)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message:
-                    err.message || "An error occurred while creating an appointment."
-            });
-        });
 }
 
-exports.findAllAppointments = (req, res) => {
-    const idAppointment = req.query.idAppointment;
-    var condition = idAppointment ? { idAppointment: { [Op.like]: `%${idAppointment}%` } } : null;
+export const findAllAppointments = async (req, res) => {
+    try {
+        const { idAppointment } = req.query;
+        var condition = idAppointment ? { idAppointment: { [Op.like]: `%${idAppointment}%` } } : null;
 
-    Appointment.findAll({ where: condition })
-        .then(data => {
-            res.send(data);
+        Appointment.findAll({
+            where: condition
         })
-        .catch(err => {
-            res.status(500).send({
-                message:
-                    err.message || "An error occurred while retrieving appointments."
-            });
-        });
+
+        res.status(200).json({
+            message: "Appointments retrieved successfully."
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "Error finding the appointments."
+        })
+    }
 }
 
-exports.findOneAppointmentById = (req, res) => {
-    const idAppointment = req.params.idAppointment;
-
-    Appointment.findByPk(idAppointment)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message:
-                    err.message || "An error occurred while retrieving the appointment."
-            });
-        });
+export const findOneAppointmentById = async (req, res) => {
 
 }
-exports.findAppointmentsByPatientId = (req, res) => {
+export const findAppointmentsByPatientId = async (req, res) => {
     const idPatient = req.params.idPatient;
 
     Appointment.findAll({ where: { idPatient: idPatient } })
@@ -78,7 +68,7 @@ exports.findAppointmentsByPatientId = (req, res) => {
         });
 }
 
-exports.findAppointmentsByDoctorId = (req, res) => {
+export const findAppointmentsByDoctorId = async (req, res) => {
     const idUser = req.params.idUser;
 
     Appointment.findAll({ where: { idUser: idUser } })
@@ -93,7 +83,7 @@ exports.findAppointmentsByDoctorId = (req, res) => {
         });
 }
 
-exports.findAppointmentsByDate = (req, res) => {
+export const findAppointmentsByDate = async (req, res) => {
     const appointmentDate = req.params.appointmentDate;
 
     Appointment.findAll({ where: { appointmentDate: appointmentDate } })
@@ -108,7 +98,7 @@ exports.findAppointmentsByDate = (req, res) => {
         });
 }
 
-exports.findAppointmentsByDateRange = (req, res) => {
+export const findAppointmentsByDateRange = async (req, res) => {
     const startDate = req.params.startDate;
     const endDate = req.params.endDate;
 
@@ -124,50 +114,51 @@ exports.findAppointmentsByDateRange = (req, res) => {
         });
 }
 
-exports.updateAppointment = (req, res) => {
-    const idAppointment = req.params.idAppointment;
+export const updateAppointment = async (req, res) => {
+    try {
+        const { idAppointment } = req.params;
+        const { appointmentDate, idPatient, idTreatment, idUser } = req.body;
 
-    Appointment.update(req.body, {
-        where: { idAppointment: idAppointment }
-    })
-        .then(num => {
-            if(num == 1) {
-                res.send({
-                    message: "Appointment was updated successfully."
-                })
-            } else {
-                res.send({
-                    message: `Cannot update appointment with id=${idAppointment}. Maybe appointment was not found or req.body is empty!`
-                })
-            }
+        const appointment = await Appointment.findByPk(idAppointment)
+
+        if (!appointment) {
+            res.status(404).json({
+                message: "Appointment couldn't be found."
+            })
+        } else {
+            appointment.appointmentDate = appointmentDate
+            appointment.idPatient = idPatient
+            appointment.idTreatment = idTreatment
+            appointment.idUser = idUser
+
+            await appointment.save()
+
+            res.status(200).json({
+                message: "Appointment updated successfully."
+            })
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Error while updating the appointment"
         })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error updating appointment with id=" + idAppointment
-            });
-        })
+    }
 }
 
-exports.deleteAppointment = (req, res) => {
-    const idAppointment = req.params.idAppointment;
-
-    Appointment.destroy({
-        where: { idAppointment: idAppointment }
-    })
-        .then(num => {
-            if(num == 1) {
-                res.send({
-                    message: "Appointment was deleted successfully."
-                })
-            } else {
-                res.send({
-                    message: `Cannot delete appointment with id=${idAppointment}. Maybe appointment was not found!`
-                })
+export const deleteAppointment = async (req, res) => {
+    try {
+        const { idAppointment } = req.params;
+        await Appointment.destroy({
+            where: {
+                idAppointment: idAppointment
             }
         })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error deleting appointment with id=" + idAppointment
-            });
+        res.status(204).json({
+            message: "Appointment deleted successfully."
         })
+    } catch (error) {
+        res.status(500).json({ 
+            message: "Error while deleting the appointment."
+        })
+    }
 }

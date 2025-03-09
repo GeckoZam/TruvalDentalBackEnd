@@ -1,14 +1,23 @@
-const express = require('express')
-const noteController = require('../controllers/note.controller')
+import { Router } from "express";
 
-const router = express.Router()
+import { 
+    createNote,
+    findAllNotes,
+    findOneNoteById,
+    findNotesByPatientId,
+    findNotesByNoteTypeId,
+    updateNote,
+    deleteNote
+} from '../controllers/note.controller.js';
 
-router.route('/').post(noteController.createNote)
-router.route('/').get(noteController.findAllNotes)
-router.route('/:id').get(noteController.findOneNoteById)
-router.route('/:id').get(noteController.findNotesByPatientId)
-router.route('/:id').get(noteController.findNotesByDoctorId)
-router.route('/:id').put(noteController.updateNote)
-router.route('/:id').delete(noteController.deleteNote)
+const router = Router()
 
-module.exports = router;
+router.post('/notes', createNote)
+router.get('/notes', findAllNotes)
+router.get('/notes/:idNote', findOneNoteById)
+router.get('/notes/:idPatient', findNotesByPatientId)
+router.get('/notes/:idNoteType', findNotesByNoteTypeId)
+router.put('/notes/:idNote', updateNote)
+router.delete('/notes/:idNote', deleteNote)
+
+export default router;

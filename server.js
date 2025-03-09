@@ -15,7 +15,7 @@ async function main() {
         console.log('All models were synchronized successfully.');
         app.listen(8080, () => {
             console.log('Server is running on port 8080');
-        });
+        }); 
     } catch (error) {
         console.error('Unable to connect to the database:', error);
     }
