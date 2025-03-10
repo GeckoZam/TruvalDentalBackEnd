@@ -24,10 +24,14 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "nodemon": "^3.1.9",
+    "jsonwebtoken": "^9.0.2",
     "pg": "^8.13.3",
     "pg-hstore": "^2.3.4",
     "pg-promise": "^11.10.2",
+    "resend": "^4.1.2",
     "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }

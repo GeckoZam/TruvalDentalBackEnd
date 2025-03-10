@@ -8,7 +8,7 @@ export const User = sequelize.define("user", {
         primaryKey: true,
         autoIncrement: true
     },
-    username:{
+    username: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -19,7 +19,23 @@ export const User = sequelize.define("user", {
     password: {
         type: DataTypes.STRING,
         allowNull: false
-    }
+    },
+    isVerified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    resetPasswordToken: {
+        type: DataTypes.STRING
+    },
+    resetPasswordExpiresAt: {
+        type: DataTypes.DATE
+    },
+    verificationToken: {
+        type: DataTypes.STRING
+    },
+    verificationTokenExpiresAt: {
+        type: DataTypes.DATE
+    },
 })
 
 User.hasMany(Appointment, {
